@@ -19,6 +19,11 @@
                     </div>
 
                     <div class="labelandInputContainer">
+                        <label for="wordCount">Word count:</label>
+                        <input type="number" id="wordCount" name="wordCount" min="1">
+                    </div>
+
+                    <div class="labelandInputContainer">
                         <label for="topic">Topics (comma-separated):</label>
                         <textarea id="topic" name="topic"></textarea><br><br>
                     </div>
@@ -36,27 +41,38 @@
     
 
     <script>
-        const API_KEY = "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";
+        const API_KEY = "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";
 
         document.getElementById('subjectForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
             const subject = document.getElementById('subject').value;
+            const wordCount = document.getElementById('wordCount').value || '300'; // Default to 300 if not specified
             const topics = document.getElementById('topic').value.split(',').map(topic => topic.trim());
 
             document.getElementById('responses').innerHTML = ""; // Clear previous responses
 
             for (let topic of topics) {
-                if (subject && topic) {
-                    await getCompletion(subject, topic);
+                if (subject && topic && wordCount) {
+                    await getCompletion(subject, topic, wordCount);
                 } else {
-                    alert('Please fill in both subject and topics.');
+                    alert('Please fill in all fields.');
                     break;
                 }
             }
         });
 
-        async function getCompletion(subject, topic) {
+        async function getCompletion(subject, topic, wordCount) {
+            const content = `
+                ${subject}
+                ${topic}
+                
+                Escribe sobre ${topic} en ${wordCount} palabras. de una manera natural y trata de no usar palabras tecnicas, a menos que sea necesario.
+                Instrucciones: 
+                Usa Html Markup
+                Escribe en 3ra persona
+            `;
+
             const res = await fetch("https://api.openai.com/v1/chat/completions", {
                 method: "POST",
                 headers: {
@@ -67,19 +83,7 @@
                     model: "gpt-3.5-turbo",
                     messages: [{
                         role: "user",
-                        content: `
-                            ${subject}
-                            ${topic}
-
-                            Code:[Use high-volume relevant keywords in the content
-                            <h1>${topic}</h1>
-                            <p>Write a 100-word paragraph answering questions like Wikipedia: what is ${topic} and what these services include in a <ul> list<br> </p>]
-                            
-                            Instructions: 
-                            Add Html Markup
-                            Write in 3rd person
-                            do not forget to put the h1 and the p in the response
-                        `,
+                        content: content,
                     }],
                     temperature: 0.9,
                 }),
