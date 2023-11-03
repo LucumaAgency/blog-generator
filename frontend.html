@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Magic money generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="pageWrapper">
+        <div class="contentContainer">
+            <div class="titleContainer">
+                <h1>Magic money generator</h1>
+            </div>
+            <div class="formContainer">
+                <form id="subjectForm">
+                    <div class="labelandInputContainer">
+                        <label for="subject">Subject:</label>
+                        <input type="text" id="subject" name="subject">
+                    </div>
+
+                    <div class="labelandInputContainer">
+                        <label for="topic">Topics (comma-separated):</label>
+                        <textarea id="topic" name="topic"></textarea><br><br>
+                    </div>
+
+                    <div>
+                        <input type="submit" value="Submit" class="primaryButton">
+                    </div>
+                </form>
+            </div>
+            <div class="responseContainer">
+                <div id="responses"></div>
+            </div>
+        </div>
+    </div>
+    
+
+    <script>
+        const API_KEY = "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";
+
+        document.getElementById('subjectForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const subject = document.getElementById('subject').value;
+            const topics = document.getElementById('topic').value.split(',').map(topic => topic.trim());
+
+            document.getElementById('responses').innerHTML = ""; // Clear previous responses
+
+            for (let topic of topics) {
+                if (subject && topic) {
+                    await getCompletion(subject, topic);
+                } else {
+                    alert('Please fill in both subject and topics.');
+                    break;
+                }
+            }
+        });
+
+        async function getCompletion(subject, topic) {
+            const res = await fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + API_KEY,
+                },
+                body: JSON.stringify({
+                    model: "gpt-3.5-turbo",
+                    messages: [{
+                        role: "user",
+                        content: `
+                            ${subject}
+                            ${topic}
+
+                            Code:[Use high-volume relevant keywords in the content
+                            <h1>${topic}</h1>
+                            <p>Write a 100-word paragraph answering questions like Wikipedia: what is ${topic} and what these services include in a <ul> list<br> </p>]
+                            
+                            Instructions: 
+                            Add Html Markup
+                            Write in 3rd person
+                            do not forget to put the h1 and the p in the response
+                        `,
+                    }],
+                    temperature: 0.9,
+                }),
+            });
+
+            const data = await res.json();
+            document.getElementById('responses').innerHTML += `<div class="response">${data.choices[0].message.content}</div>`;
+        }
+    </script>
+</body>
+</html>
