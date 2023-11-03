@@ -1,0 +1,43 @@
+*{
+    font-family: "montserrat";
+    padding: 0px;
+    margin: 0px;
+}
+
+.pageWrapper{
+    background-color: white;
+}
+
+.contentContainer{
+    width: 90vw;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.primaryButton{
+    font-weight: bold;
+    background-color: #407BFF;
+    border: 1px solid #407BFF;
+    color:white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.labelandInputContainer{
+    display: flex;
+    flex-direction: column;
+}
+
+label{
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+}
+
+input, textarea{
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    border: 0.2px solid gray;
+}
